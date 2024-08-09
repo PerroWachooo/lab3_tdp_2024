@@ -24,12 +24,15 @@ class Live {
     public:    
         
         std::priority_queue<Subproblem, std::vector<Subproblem>, CompareCotaSuperior> listaSubproblemas;
+        double Z_sup, Z_inf; // Cota superior e inferior global
+        
+        Subproblem best; // Mejor solución encontrada
 
         // Constructor
         Live();
 
         // Agregar un nuevo subproblema a la lista de vivos
-        void addSubproblem(vector<std::vector<float>> Matriz,double c_sup, double c_inf);
+        void addSubproblem(Subproblem sp);
 
         // Obtener y eliminar el subproblema con la mejor cota superior
         Subproblem getBestSubproblem();
@@ -37,7 +40,11 @@ class Live {
         // Verificar si la lista de subproblemas vivos está vacía
         bool isEmpty();
 
+        // Imprimir la solución de una matriz a
+        void printSolutionMatrix(std::vector<float> r);
 
+        // Algoritmo BB
+        void branchAndBound(Simplex s);
 
 
 

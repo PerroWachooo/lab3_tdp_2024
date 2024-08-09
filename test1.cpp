@@ -4,10 +4,9 @@
 using namespace std;
 
 int main() {
-    Simplex s("P2.txt");
+    Simplex s("f2.txt");
 
     s.insertConstraint(5, 2,1); // insertamos variable x2 con restricion  x2 <= 5
-    s.printProblemMatrix();
 // Se guarda la matriz en una variable
 
     std::vector<std::vector<float>> matriz2 = s.a;
@@ -32,6 +31,28 @@ int main() {
     for (int i = 1; i < (s.m1 + s.m2 + s.m3)-1; i++){
         cout << matriz2[0][i] << "x" << i << " + ";
     }
+
+
+    float min = 1000000;
+    int index = 0;
+      for (int i = 1; i < (s.m1 + s.m2 + s.m3)-1; i++){
+                    if (abs(sol[i] - 0.5) < min){
+                        min = abs(sol[i] - 0.5);
+                        index = i;
+                    }
+                }
+
+    float c_inferior = 0;
+    for (int i = 1; i < (s.m1 + s.m2 + s.m3)-1; i++){
+        if (i == index){
+            
+        }
+        else{
+           c_inferior=  matriz2[0][i] + c_inferior;
+        }
+    }
+
+    cout << "Cota inferior: " << c_inferior << endl;
      
 
 }

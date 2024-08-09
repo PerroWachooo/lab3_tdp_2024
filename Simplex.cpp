@@ -1,5 +1,11 @@
 #include "Simplex.h"
 
+
+
+Simplex::Simplex()
+{
+}
+
 /*
     Metodo: Constructor
     Descripcion: este metodo permite iniciar un Simplex, recibiendo

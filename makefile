@@ -1,4 +1,4 @@
-FLAGS = -O2
+FLAGS = -g
 
 all: test1
 

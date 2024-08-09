@@ -6,6 +6,7 @@
 
 #include "Simplex.h"
 #include "Subproblem.h"
+#include "Live.h"
 
 using namespace std;
 
@@ -42,20 +43,27 @@ int main(){
                     return 1;
                 }
 
+
+                //Se crea un LIVE
+                Live live;
+
+
                 // Se lee el archivo  y se crea un simplex
                 Simplex s(filename);
+
 
                 //Se guarda la matriz del probelma en una variable
                 std::vector<std::vector<float>> matriz = s.a;
 
                 // Se imprime la matriz del problema
-                s.printProblemMatrix();
+                //s.printProblemMatrix();  <------- Causa error en archivos grandes
 
                 // Se resuelve el problema y se guarda la solucion
                std::vector<float> r = s.solve();
                 //Se saca el Zmax
                 float Zmax = r[0];
 
+                
                 // Se imprime la solucion
                 cout << "Solucion: ";
                 for (int i = 0; i < r.size(); i++){
@@ -63,13 +71,55 @@ int main(){
                 }
 
                 //Se crea un subproblema
-                Subproblem sp(s.a, 0, 0);
+                Subproblem sp(s.a, 0, 0, s);
 
 
+
+                //Calculamos la cota inferior, remplazando con 0 en la función a optimizar, el valor de la variable más cercana a 0,5 del vector solución
+                
+                //Encontramos la posición del valor más cercano a 0.5
+                float min = 1000000;
+                int index = 0;
+                  for (int i = 1; i < (s.m1 + s.m2 + s.m3)-1; i++){
+                                if (abs(r[i] - 0.5) < min){
+                                    min = abs(r[i] - 0.5);
+                                    index = i;
+                                }
+                            }
+
+                
+                //Calculamos la cota inferior
+                float Zinf = 0;
+                for (int i = 1; i < (s.m1 + s.m2 + s.m3)-1; i++){
+                    if (i == index){
+
+                    }
+                    else{
+                       Zinf=  matriz[0][i] + Zinf;
+                    }
+                }
+                cout << "Cota inferior: " << Zinf << endl;
+
+                //Definimos los valores de la cota superior e inferior en el subproblema
                 sp.c_sup = Zmax;
+                sp.c_inf = Zinf;
+
+                //Se crean  2 subroblemas más, uno con la restrición de la variable más cercana a 0 y otro con la restricción de la variable más cercana a 1
+                Simplex simplex_aux_menor_cero = s.copy();
+                simplex_aux_menor_cero.insertConstraint(0, index, 1); //Se inserta la restricción x[index] <= 0
+                Simplex simplex_aux_mayor_cero = s.copy();
+                simplex_aux_mayor_cero.insertConstraint(1, index, 2); //Se inserta la restricción x[index] >= 1
+                
+                Subproblem sp1(simplex_aux_menor_cero.a, 0, 0, simplex_aux_menor_cero);
+                Subproblem sp2(simplex_aux_mayor_cero.a, 0, 0, simplex_aux_mayor_cero);
+
+                //Se agregan los subproblemas al vector live
+                live.addSubproblem(sp);
+                live.addSubproblem(sp1);
+                live.addSubproblem(sp2);
 
 
-               
+
                 // Se cierra el archivo
                 inputFile.close();
 
